@@ -1,6 +1,6 @@
-package com.fiap.diaghealthy.infrastructure.dtos.user.doctor;
+package com.fiap.diaghealthy.application.inputs;
 
-public record DoctorUpdateDTO(
+public record DoctorUpdateInput(
         String name,
         String email,
         boolean isActive,
