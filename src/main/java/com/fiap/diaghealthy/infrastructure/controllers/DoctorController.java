@@ -1,5 +1,6 @@
 package com.fiap.diaghealthy.infrastructure.controllers;
 
+import com.fiap.diaghealthy.application.exceptions.UnauthorizedException;
 import com.fiap.diaghealthy.application.usecases.CreateDoctorUseCase;
 import com.fiap.diaghealthy.application.usecases.UpdateDoctorUseCase;
 import com.fiap.diaghealthy.infrastructure.dtos.user.doctor.DoctorCreateDTO;
@@ -45,7 +46,7 @@ public class DoctorController {
     @PutMapping("/{id}")
     public ResponseEntity<DoctorResponseDTO> update (
             @PathVariable ("id") UUID id,
-            @RequestBody DoctorUpdateDTO doctorUpdateDTO) {
+            @RequestBody DoctorUpdateDTO doctorUpdateDTO) throws UnauthorizedException {
 
         var doctorUpdateInput = doctorMapper.toUpdateInput(doctorUpdateDTO);
         var doctorUpdated = updateDoctorUseCase.execute(id, doctorUpdateInput);
