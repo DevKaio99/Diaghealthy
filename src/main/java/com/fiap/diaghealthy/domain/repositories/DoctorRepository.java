@@ -13,4 +13,5 @@ public interface DoctorRepository {
     Optional <Doctor> findDoctorById (UUID id);
     Doctor updateDoctor (Doctor doctor);
     Optional <Doctor> findByEmailIgnoreCase (String email);
+    boolean findDoctorByCRM(String crm);
 }

@@ -22,6 +22,10 @@ public class CreateDoctorUseCase {
             throw new BusinessException("Email já cadastrado");
         }
 
+        if (doctorRepository.findDoctorByCRM(doctorCreateInput.crm())) {
+            throw new BusinessException("CRM já cadastrado");
+        }
+
         String passwordHash = passwordEncoder.encode(doctorCreateInput.password());
 
         Doctor doctor = new Doctor(

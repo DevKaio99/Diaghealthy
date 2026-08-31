@@ -3,9 +3,9 @@ package com.fiap.diaghealthy.infrastructure.mappers;
 import com.fiap.diaghealthy.application.inputs.DoctorCreateInput;
 import com.fiap.diaghealthy.application.inputs.DoctorUpdateInput;
 import com.fiap.diaghealthy.domain.entities.Doctor;
-import com.fiap.diaghealthy.infrastructure.dtos.user.doctor.DoctorCreateDTO;
-import com.fiap.diaghealthy.infrastructure.dtos.user.doctor.DoctorResponseDTO;
-import com.fiap.diaghealthy.infrastructure.dtos.user.doctor.DoctorUpdateDTO;
+import com.fiap.diaghealthy.infrastructure.dtos.users.doctor.DoctorCreateDTO;
+import com.fiap.diaghealthy.infrastructure.dtos.users.doctor.DoctorResponseDTO;
+import com.fiap.diaghealthy.infrastructure.dtos.users.doctor.DoctorUpdateDTO;
 import org.springframework.stereotype.Component;
 
 @Component

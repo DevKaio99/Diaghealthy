@@ -38,6 +38,11 @@ public class UpdateDoctorUseCase {
             throw new BusinessException("Email já cadastrado.");
         }
 
+        if (!doctor.getCRM().equals(doctorUpdateInput.crm())
+        && doctorRepository.findDoctorByCRM(doctorUpdateInput.crm())) {
+            throw new BusinessException("CRM já cadastrado.");
+        }
+
         doctor.setName(doctorUpdateInput.name());
         doctor.setEmail(doctorUpdateInput.email());
         doctor.setActive(doctorUpdateInput.isActive());

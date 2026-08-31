@@ -1,7 +1,7 @@
 package com.fiap.diaghealthy.infrastructure.controllers;
 
-import com.fiap.diaghealthy.infrastructure.dtos.user.UserAutenticationDTO;
-import com.fiap.diaghealthy.infrastructure.dtos.user.UserLoginResponseDTO;
+import com.fiap.diaghealthy.infrastructure.dtos.users.UserAutenticationDTO;
+import com.fiap.diaghealthy.infrastructure.dtos.users.UserLoginResponseDTO;
 import com.fiap.diaghealthy.infrastructure.security.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

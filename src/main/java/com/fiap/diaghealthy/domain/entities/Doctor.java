@@ -15,6 +15,10 @@ public class Doctor extends User {
         super(name, email, password, Role.DOCTOR);
         this.CRM = CRM;
         this.speciality = speciality;
+
+        if (CRM == null || CRM.isBlank()) {
+            throw new IllegalArgumentException("Insira um CRM");
+        }
     }
 
     public static Doctor reconstitute(

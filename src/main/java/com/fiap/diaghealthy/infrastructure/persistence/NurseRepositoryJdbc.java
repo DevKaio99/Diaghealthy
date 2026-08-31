@@ -1,8 +1,8 @@
 package com.fiap.diaghealthy.infrastructure.persistence;
 
-import com.fiap.diaghealthy.domain.entities.Doctor;
-import com.fiap.diaghealthy.domain.repositories.DoctorRepository;
-import com.fiap.diaghealthy.infrastructure.mappers.DoctorJdbcMapper;
+import com.fiap.diaghealthy.domain.entities.Nurse;
+import com.fiap.diaghealthy.domain.repositories.NurseRepository;
+import com.fiap.diaghealthy.infrastructure.mappers.NurseJdbcMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,24 +13,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public class DoctorRepositoryJdbc implements DoctorRepository {
+public class NurseRepositoryJdbc implements NurseRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final DoctorJdbcMapper doctorJdbcMapper;
+    private final NurseJdbcMapper nurseJdbcMapper;
 
-    public DoctorRepositoryJdbc(
+    public NurseRepositoryJdbc(
             JdbcTemplate jdbcTemplate,
-            DoctorJdbcMapper doctorJdbcMapper
+            NurseJdbcMapper nurseJdbcMapper
     ) {
         this.jdbcTemplate = jdbcTemplate;
-        this.doctorJdbcMapper = doctorJdbcMapper;
+        this.nurseJdbcMapper = nurseJdbcMapper;
     }
 
     @Override
     @Transactional
-    public Doctor save(Doctor doctor) {
+    public Nurse save(Nurse nurse) {
 
-        String usersSql = """
+        String userSql = """
                 INSERT INTO users (
                     id,
                     name,
@@ -45,34 +45,32 @@ public class DoctorRepositoryJdbc implements DoctorRepository {
                 """;
 
         jdbcTemplate.update(
-                usersSql,
-                doctor.getId(),
-                doctor.getName(),
-                doctor.getEmail(),
-                doctor.getPassword(),
-                doctor.getDateLastUpdate(),
-                doctor.getCreatedAt(),
-                doctor.isActive(),
-                doctor.getRole().name()
+                userSql,
+                nurse.getId(),
+                nurse.getName(),
+                nurse.getEmail(),
+                nurse.getPassword(),
+                nurse.getDateLastUpdate(),
+                nurse.getCreatedAt(),
+                nurse.isActive(),
+                nurse.getRole().name()
         );
 
-        String doctorsSql = """
-                INSERT INTO doctors (
+        String nurseSql = """
+                INSERT INTO nurses (
                     id,
-                    crm,
-                    speciality
+                    coren
                 )
-                VALUES (?, ?, ?)
+                VALUES (?, ?)
                 """;
 
         jdbcTemplate.update(
-                doctorsSql,
-                doctor.getId(),
-                doctor.getCRM(),
-                doctor.getSpeciality()
+                nurseSql,
+                nurse.getId(),
+                nurse.getCoren()
         );
 
-        return doctor;
+        return nurse;
     }
 
     @Override
@@ -96,7 +94,7 @@ public class DoctorRepositoryJdbc implements DoctorRepository {
     }
 
     @Override
-    public List<Doctor> doctorList() {
+    public List<Nurse> nurseList() {
 
         String sql = """
                 SELECT
@@ -108,22 +106,21 @@ public class DoctorRepositoryJdbc implements DoctorRepository {
                     u.created_at,
                     u.is_active,
                     u.role,
-                    d.crm,
-                    d.speciality
+                    n.coren
                 FROM users u
-                INNER JOIN doctors d
-                    ON d.id = u.id
-                WHERE u.role = 'DOCTOR'
+                INNER JOIN nurses n
+                    ON n.id = u.id
+                WHERE u.role = 'NURSE'
                 """;
 
         return jdbcTemplate.query(
                 sql,
-                doctorJdbcMapper
+                nurseJdbcMapper
         );
     }
 
     @Override
-    public Optional<Doctor> findDoctorById(UUID id) {
+    public Optional<Nurse> findNurseById(UUID id) {
 
         String sql = """
                 SELECT
@@ -135,18 +132,17 @@ public class DoctorRepositoryJdbc implements DoctorRepository {
                     u.created_at,
                     u.is_active,
                     u.role,
-                    d.crm,
-                    d.speciality
+                    n.coren
                 FROM users u
-                INNER JOIN doctors d
-                    ON d.id = u.id
+                INNER JOIN nurses n
+                    ON n.id = u.id
                 WHERE u.id = ?
-                  AND u.role = 'DOCTOR'
+                  AND u.role = 'NURSE'
                 """;
 
         return jdbcTemplate.query(
                         sql,
-                        doctorJdbcMapper,
+                        nurseJdbcMapper,
                         id
                 )
                 .stream()
@@ -155,55 +151,55 @@ public class DoctorRepositoryJdbc implements DoctorRepository {
 
     @Override
     @Transactional
-    public Doctor updateDoctor(Doctor doctor) {
+    public Nurse updateNurse(Nurse nurse) {
 
         LocalDateTime now = LocalDateTime.now();
 
-        String sqlUser = """
+        String userSql = """
                 UPDATE users
                 SET
                     name = ?,
                     email = ?,
+                    password = ?,
                     date_last_update = ?,
                     is_active = ?
                 WHERE id = ?
-                  AND role = 'DOCTOR'
+                  AND role = 'NURSE'
                 """;
 
         jdbcTemplate.update(
-                sqlUser,
-                doctor.getName(),
-                doctor.getEmail(),
+                userSql,
+                nurse.getName(),
+                nurse.getEmail(),
+                nurse.getPassword(),
                 now,
-                doctor.isActive(),
-                doctor.getId()
+                nurse.isActive(),
+                nurse.getId()
         );
 
-        String sqlDoctor = """
-                UPDATE doctors
+        String nurseSql = """
+                UPDATE nurses
                 SET
-                    crm = ?,
-                    speciality = ?
+                    coren = ?
                 WHERE id = ?
                 """;
 
         jdbcTemplate.update(
-                sqlDoctor,
-                doctor.getCRM(),
-                doctor.getSpeciality(),
-                doctor.getId()
+                nurseSql,
+                nurse.getCoren(),
+                nurse.getId()
         );
 
-        return findDoctorById(doctor.getId())
+        return findNurseById(nurse.getId())
                 .orElseThrow(() ->
                         new IllegalStateException(
-                                "Médico não encontrado após atualização"
+                                "Enfermeiro não encontrado após atualização"
                         )
                 );
     }
 
     @Override
-    public Optional<Doctor> findByEmailIgnoreCase(String email) {
+    public Optional<Nurse> findByEmailIgnoreCase(String email) {
 
         String sql = """
                 SELECT
@@ -215,18 +211,17 @@ public class DoctorRepositoryJdbc implements DoctorRepository {
                     u.created_at,
                     u.is_active,
                     u.role,
-                    d.crm,
-                    d.speciality
+                    n.coren
                 FROM users u
-                INNER JOIN doctors d
-                    ON d.id = u.id
+                INNER JOIN nurses n
+                    ON n.id = u.id
                 WHERE LOWER(u.email) = LOWER(?)
-                  AND u.role = 'DOCTOR'
+                  AND u.role = 'NURSE'
                 """;
 
         return jdbcTemplate.query(
                         sql,
-                        doctorJdbcMapper,
+                        nurseJdbcMapper,
                         email
                 )
                 .stream()
@@ -234,13 +229,13 @@ public class DoctorRepositoryJdbc implements DoctorRepository {
     }
 
     @Override
-    public boolean findDoctorByCRM(String crm) {
+    public boolean findNurseByCoren(String coren) {
 
         String sql = """
                 SELECT EXISTS (
                     SELECT 1
-                    FROM doctors
-                    WHERE crm = ?
+                    FROM nurses
+                    WHERE coren = ?
                 )
                 """;
 
@@ -248,8 +243,9 @@ public class DoctorRepositoryJdbc implements DoctorRepository {
                 jdbcTemplate.queryForObject(
                         sql,
                         Boolean.class,
-                        crm
+                        coren
                 )
         );
     }
 }
+

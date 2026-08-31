@@ -18,19 +18,62 @@ public class DataInitializer {
     ) {
         return args -> {
 
-            String email = "admin@email.com";
+            createUser(
+                    userRepository,
+                    passwordEncoder,
+                    "Administrador",
+                    "admin@email.com",
+                    "admin123",
+                    Role.ADMIN
+            );
 
-            if (userRepository.findByEmailIgnoreCase(email).isEmpty()) {
+            createUser(
+                    userRepository,
+                    passwordEncoder,
+                    "Paciente Teste",
+                    "patient@email.com",
+                    "patient123",
+                    Role.PATIENT
+            );
 
-                User admin = new User(
-                        "Administrador",
-                        email,
-                        passwordEncoder.encode("admin123"),
-                        Role.ADMIN
-                );
+            createUser(
+                    userRepository,
+                    passwordEncoder,
+                    "Enfermeiro Teste",
+                    "nurse@email.com",
+                    "nurse123",
+                    Role.NURSE
+            );
 
-                userRepository.saveUser(admin);
-            }
+            createUser(
+                    userRepository,
+                    passwordEncoder,
+                    "Doutor Teste",
+                    "doctor@email.com",
+                    "doctor123",
+                    Role.DOCTOR
+            );
         };
+    }
+
+    private void createUser(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            String name,
+            String email,
+            String password,
+            Role role
+    ) {
+        if (userRepository.findByEmailIgnoreCase(email).isEmpty()) {
+
+            User user = new User(
+                    name,
+                    email,
+                    passwordEncoder.encode(password),
+                    role
+            );
+
+            userRepository.saveUser(user);
+        }
     }
 }

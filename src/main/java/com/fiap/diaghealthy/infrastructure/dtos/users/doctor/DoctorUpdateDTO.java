@@ -1,4 +1,4 @@
-package com.fiap.diaghealthy.infrastructure.dtos.user.doctor;
+package com.fiap.diaghealthy.infrastructure.dtos.users.doctor;
 
 public record DoctorUpdateDTO(
         String name,
