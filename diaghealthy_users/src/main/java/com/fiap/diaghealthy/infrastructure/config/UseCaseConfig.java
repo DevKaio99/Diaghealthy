@@ -5,6 +5,7 @@ import com.fiap.diaghealthy.application.usecases.*;
 import com.fiap.diaghealthy.domain.repositories.DoctorRepository;
 import com.fiap.diaghealthy.domain.repositories.NurseRepository;
 import com.fiap.diaghealthy.domain.repositories.PatientRepository;
+import com.fiap.diaghealthy.domain.repositories.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,6 +41,11 @@ public class UseCaseConfig {
     @Bean
     public UpdateNurseUseCase updateNurseUseCase (NurseRepository nurseRepository, CurrentUser currentUser) {
         return new UpdateNurseUseCase(nurseRepository, currentUser);
+    }
+
+    @Bean
+    public UpdatePasswordUseCase updatePasswordUseCase (UserRepository userRepository, PasswordEncoder passwordEncoder, CurrentUser currentUser) {
+        return new UpdatePasswordUseCase(userRepository, passwordEncoder, currentUser);
     }
 
 }
