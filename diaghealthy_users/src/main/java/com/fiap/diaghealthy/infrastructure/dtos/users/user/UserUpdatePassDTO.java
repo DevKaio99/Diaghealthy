@@ -1,4 +1,4 @@
-package com.fiap.diaghealthy.infrastructure.dtos.users;
+package com.fiap.diaghealthy.infrastructure.dtos.users.user;
 
 import jakarta.validation.constraints.NotBlank;
 

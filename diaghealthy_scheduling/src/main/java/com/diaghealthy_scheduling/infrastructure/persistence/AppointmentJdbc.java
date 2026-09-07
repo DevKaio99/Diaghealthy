@@ -21,20 +21,22 @@ public class AppointmentJdbc implements AppointmentRepository {
     @Override
     public Appointment saveAppointment(Appointment appointment) {
 
+        System.out.println("ID do agendamento: " + appointment.getId());
+
         String sql = """
-                INSERT INTO appointments (
-                    id,
-                    patient_id,
-                    doctor_id,
-                    nurse_id,
-                    scheduled_at,
-                    status,
-                    reason,
-                    created_at,
-                    updated_at
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+            INSERT INTO appointments (
+                id,
+                patient_id,
+                doctor_id,
+                nurse_id,
+                scheduled_at,
+                status,
+                reason,
+                created_at,
+                updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
 
         jdbcTemplate.update(
                 sql,

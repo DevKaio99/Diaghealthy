@@ -5,12 +5,13 @@ import com.diaghealthy_scheduling.application.inputs.AppointmentUpdateInput;
 import com.diaghealthy_scheduling.application.usecases.CreateAppointmentUseCase;
 import com.diaghealthy_scheduling.application.usecases.UpdateAppointmentUseCase;
 import com.diaghealthy_scheduling.domain.entities.Appointment;
-import com.diaghealthy_scheduling.infrastructure.dtos.AppointmentCreateDTO;
-import com.diaghealthy_scheduling.infrastructure.dtos.AppointmentResponseDTO;
-import com.diaghealthy_scheduling.infrastructure.dtos.AppointmentUpdateDTO;
+import com.diaghealthy_scheduling.infrastructure.dtos.appointment.AppointmentCreateDTO;
+import com.diaghealthy_scheduling.infrastructure.dtos.appointment.AppointmentResponseDTO;
+import com.diaghealthy_scheduling.infrastructure.dtos.appointment.AppointmentUpdateDTO;
 import com.diaghealthy_scheduling.infrastructure.mappers.AppointmentMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class AppointmentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
     public ResponseEntity<AppointmentResponseDTO> create(
             @RequestBody AppointmentCreateDTO appointmentCreateDTO
     ) {
@@ -50,6 +52,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'NURSE')")
     public ResponseEntity<AppointmentResponseDTO> update(
             @PathVariable UUID id,
             @RequestBody AppointmentUpdateDTO appointmentUpdateDTO

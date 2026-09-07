@@ -18,9 +18,11 @@ public class Appointment {
     private LocalDateTime updatedAt;
 
     public Appointment(UUID patientId, UUID doctorId, UUID nurseId, LocalDateTime scheduledAt, String reason) {
+        this.id = UUID.randomUUID();
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.nurseId = nurseId;
+        this.scheduledAt = scheduledAt;
         this.status = AppointmentStatus.SCHEDULED;
         this.reason = reason;
         this.createdAt = LocalDateTime.now();

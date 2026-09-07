@@ -3,9 +3,9 @@ package com.diaghealthy_scheduling.infrastructure.mappers;
 import com.diaghealthy_scheduling.application.inputs.AppointmentCreateInput;
 import com.diaghealthy_scheduling.application.inputs.AppointmentUpdateInput;
 import com.diaghealthy_scheduling.domain.entities.Appointment;
-import com.diaghealthy_scheduling.infrastructure.dtos.AppointmentCreateDTO;
-import com.diaghealthy_scheduling.infrastructure.dtos.AppointmentResponseDTO;
-import com.diaghealthy_scheduling.infrastructure.dtos.AppointmentUpdateDTO;
+import com.diaghealthy_scheduling.infrastructure.dtos.appointment.AppointmentCreateDTO;
+import com.diaghealthy_scheduling.infrastructure.dtos.appointment.AppointmentResponseDTO;
+import com.diaghealthy_scheduling.infrastructure.dtos.appointment.AppointmentUpdateDTO;
 import org.springframework.stereotype.Component;
 
 @Component

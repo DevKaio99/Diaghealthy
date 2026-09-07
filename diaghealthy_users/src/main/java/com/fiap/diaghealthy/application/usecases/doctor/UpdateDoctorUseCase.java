@@ -1,4 +1,4 @@
-package com.fiap.diaghealthy.application.usecases;
+package com.fiap.diaghealthy.application.usecases.doctor;
 
 import com.fiap.diaghealthy.application.exceptions.BusinessException;
 import com.fiap.diaghealthy.application.exceptions.ResourceNotFoundException;

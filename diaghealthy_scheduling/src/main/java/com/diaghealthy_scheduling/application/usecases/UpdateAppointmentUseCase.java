@@ -18,14 +18,23 @@ public class UpdateAppointmentUseCase {
 
     public Appointment execute(UUID id, AppointmentUpdateInput input) {
 
-        Appointment appointment = appointmentRepository.findAppointmentById(input.id())
+        Appointment appointment = appointmentRepository.findAppointmentById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Agendamento não encontrado")
                 );
 
-        appointment.setScheduledAt(input.scheduledAt());
-        appointment.setStatus(input.status());
-        appointment.setReason(input.reason());
+        if (input.scheduledAt() != null) {
+            appointment.setScheduledAt(input.scheduledAt());
+        }
+
+        if (input.status() != null) {
+            appointment.setStatus(input.status());
+        }
+
+        if (input.reason() != null && !input.reason().isBlank()) {
+            appointment.setReason(input.reason());
+        }
+
         appointment.setUpdatedAt(LocalDateTime.now());
 
         return appointmentRepository.updateAppointment(appointment);

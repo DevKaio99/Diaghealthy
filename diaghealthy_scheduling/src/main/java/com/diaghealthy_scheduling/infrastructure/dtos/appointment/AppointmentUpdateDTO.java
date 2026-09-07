@@ -1,4 +1,4 @@
-package com.diaghealthy_scheduling.infrastructure.dtos;
+package com.diaghealthy_scheduling.infrastructure.dtos.appointment;
 
 import com.diaghealthy_scheduling.domain.enuns.AppointmentStatus;
 
