@@ -7,8 +7,15 @@ import com.fiap.diaghealthy.infrastructure.dtos.users.nurse.NurseCreateDTO;
 import com.fiap.diaghealthy.infrastructure.dtos.users.nurse.NurseResponseDTO;
 import com.fiap.diaghealthy.infrastructure.dtos.users.nurse.NurseUpdateDTO;
 import com.fiap.diaghealthy.infrastructure.mappers.NurseMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +24,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/users/nurse")
+@Tag(name = "Enfermeiros", description = "Gerenciamento de enfermeiros")
 public class NurseController {
 
     private final CreateNurseUseCase createNurseUseCase;
@@ -29,6 +37,22 @@ public class NurseController {
         this.nurseMapper = nurseMapper;
     }
 
+    @Operation(
+            summary = "Cadastrar enfermeiro",
+            description = "Cria um novo enfermeiro no sistema"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Enfermeiro criado",
+                    content = @Content(schema = @Schema(implementation = NurseResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<NurseResponseDTO> create (@Valid @RequestBody NurseCreateDTO nurseCreateDTO) {
@@ -42,6 +66,22 @@ public class NurseController {
                 .body(nurseResponse);
     }
 
+    @Operation(
+            summary = "Atualizar enfermeiro",
+            description = "Atualiza os dados do enfermeiro especificado pelo ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Enfermeiro atualizado",
+                    content = @Content(schema = @Schema(implementation = NurseResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Enfermeiro não encontrado",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
     @PreAuthorize("hasAnyRole('ADMIN', 'NURSE')")
     @PutMapping("/{id}")
     public ResponseEntity<NurseResponseDTO> update (
