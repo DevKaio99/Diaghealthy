@@ -1,8 +1,8 @@
 package com.fiap.diaghealthy.infrastructure.controllers;
 
 import com.fiap.diaghealthy.application.exceptions.UnauthorizedException;
-import com.fiap.diaghealthy.application.usecases.CreateNurseUseCase;
-import com.fiap.diaghealthy.application.usecases.UpdateNurseUseCase;
+import com.fiap.diaghealthy.application.usecases.nurse.CreateNurseUseCase;
+import com.fiap.diaghealthy.application.usecases.nurse.UpdateNurseUseCase;
 import com.fiap.diaghealthy.infrastructure.dtos.users.nurse.NurseCreateDTO;
 import com.fiap.diaghealthy.infrastructure.dtos.users.nurse.NurseResponseDTO;
 import com.fiap.diaghealthy.infrastructure.dtos.users.nurse.NurseUpdateDTO;

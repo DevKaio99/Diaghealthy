@@ -1,8 +1,8 @@
 package com.fiap.diaghealthy.infrastructure.controllers;
 
 import com.fiap.diaghealthy.application.exceptions.UnauthorizedException;
-import com.fiap.diaghealthy.application.usecases.CreateDoctorUseCase;
-import com.fiap.diaghealthy.application.usecases.UpdateDoctorUseCase;
+import com.fiap.diaghealthy.application.usecases.doctor.CreateDoctorUseCase;
+import com.fiap.diaghealthy.application.usecases.doctor.UpdateDoctorUseCase;
 import com.fiap.diaghealthy.infrastructure.dtos.users.doctor.DoctorCreateDTO;
 import com.fiap.diaghealthy.infrastructure.dtos.users.doctor.DoctorResponseDTO;
 import com.fiap.diaghealthy.infrastructure.dtos.users.doctor.DoctorUpdateDTO;

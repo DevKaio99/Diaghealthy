@@ -1,7 +1,14 @@
 package com.fiap.diaghealthy.infrastructure.config;
 
 import com.fiap.diaghealthy.application.services.CurrentUser;
-import com.fiap.diaghealthy.application.usecases.*;
+import com.fiap.diaghealthy.application.usecases.doctor.CreateDoctorUseCase;
+import com.fiap.diaghealthy.application.usecases.doctor.UpdateDoctorUseCase;
+import com.fiap.diaghealthy.application.usecases.nurse.CreateNurseUseCase;
+import com.fiap.diaghealthy.application.usecases.nurse.UpdateNurseUseCase;
+import com.fiap.diaghealthy.application.usecases.patient.CreatePatientUseCase;
+import com.fiap.diaghealthy.application.usecases.patient.UpdatePatientUseCase;
+import com.fiap.diaghealthy.application.usecases.user.FindUserByIdUseCase;
+import com.fiap.diaghealthy.application.usecases.user.UpdatePasswordUseCase;
 import com.fiap.diaghealthy.domain.repositories.DoctorRepository;
 import com.fiap.diaghealthy.domain.repositories.NurseRepository;
 import com.fiap.diaghealthy.domain.repositories.PatientRepository;
@@ -46,6 +53,11 @@ public class UseCaseConfig {
     @Bean
     public UpdatePasswordUseCase updatePasswordUseCase (UserRepository userRepository, PasswordEncoder passwordEncoder, CurrentUser currentUser) {
         return new UpdatePasswordUseCase(userRepository, passwordEncoder, currentUser);
+    }
+
+    @Bean
+    public FindUserByIdUseCase findUserByIdUseCase (UserRepository userRepository) {
+        return new FindUserByIdUseCase(userRepository);
     }
 
 }

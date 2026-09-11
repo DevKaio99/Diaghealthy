@@ -2,8 +2,8 @@ package com.fiap.diaghealthy.infrastructure.mappers;
 
 import com.fiap.diaghealthy.application.inputs.UserUpdatePassInput;
 import com.fiap.diaghealthy.domain.entities.User;
-import com.fiap.diaghealthy.infrastructure.dtos.users.UserResponseDTO;
-import com.fiap.diaghealthy.infrastructure.dtos.users.UserUpdatePassDTO;
+import com.fiap.diaghealthy.infrastructure.dtos.users.user.UserResponseDTO;
+import com.fiap.diaghealthy.infrastructure.dtos.users.user.UserUpdatePassDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +21,9 @@ public class UserMapper {
                     user.getId(),
                     user.getName(),
                     user.getEmail(),
-                    user.getDateLastUpdate()
+                    user.isActive(),
+                    user.getDateLastUpdate(),
+                    user.getRole()
             );
         }
 

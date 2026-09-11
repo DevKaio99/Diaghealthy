@@ -1,9 +1,10 @@
 package com.fiap.diaghealthy.infrastructure.controllers;
 
 import com.fiap.diaghealthy.application.exceptions.UnauthorizedException;
-import com.fiap.diaghealthy.application.usecases.UpdatePasswordUseCase;
-import com.fiap.diaghealthy.infrastructure.dtos.users.UserResponseDTO;
-import com.fiap.diaghealthy.infrastructure.dtos.users.UserUpdatePassDTO;
+import com.fiap.diaghealthy.application.usecases.user.FindUserByIdUseCase;
+import com.fiap.diaghealthy.application.usecases.user.UpdatePasswordUseCase;
+import com.fiap.diaghealthy.infrastructure.dtos.users.user.UserResponseDTO;
+import com.fiap.diaghealthy.infrastructure.dtos.users.user.UserUpdatePassDTO;
 import com.fiap.diaghealthy.infrastructure.mappers.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,22 +23,76 @@ import java.util.UUID;
 public class UserController {
 
     private final UpdatePasswordUseCase updatePasswordUseCase;
+    private final FindUserByIdUseCase findUserByIdUseCase;
     private final UserMapper userMapper;
 
-    public UserController(UpdatePasswordUseCase updatePasswordUseCase, UserMapper userMapper) {
+    public UserController(
+            UpdatePasswordUseCase updatePasswordUseCase,
+            FindUserByIdUseCase findUserByIdUseCase,
+            UserMapper userMapper
+    ) {
         this.updatePasswordUseCase = updatePasswordUseCase;
+        this.findUserByIdUseCase = findUserByIdUseCase;
         this.userMapper = userMapper;
     }
 
-
-    @Operation(summary = "Alteração de Senha", description = "Altera a senha do usuário especificado pelo ID exigindo a senha atual deste usuário e a senha nova")
+    @Operation(
+            summary = "Buscar usuário por ID",
+            description = "Busca os dados do usuário especificado pelo ID"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Senha atualizada",
-                    content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos ou senha atual incorreta",
-                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
-                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuário encontrado",
+                    content = @Content(
+                            schema = @Schema(implementation = UserResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado",
+                    content = @Content(
+                            schema = @Schema(implementation = ProblemDetail.class)
+                    )
+            )
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> findById(
+            @PathVariable UUID id
+    ) {
+        var user = findUserByIdUseCase.execute(id);
+
+        return ResponseEntity.ok(
+                userMapper.toDto(user)
+        );
+    }
+
+    @Operation(
+            summary = "Alteração de Senha",
+            description = "Altera a senha do usuário especificado pelo ID exigindo a senha atual deste usuário e a senha nova"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Senha atualizada",
+                    content = @Content(
+                            schema = @Schema(implementation = UserResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos ou senha atual incorreta",
+                    content = @Content(
+                            schema = @Schema(implementation = ProblemDetail.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado",
+                    content = @Content(
+                            schema = @Schema(implementation = ProblemDetail.class)
+                    )
+            )
     })
     @PutMapping("changepass/{id}")
     public ResponseEntity<UserResponseDTO> updatePass(
@@ -46,10 +101,13 @@ public class UserController {
     ) throws UnauthorizedException {
 
         var updatePasswordInput = userMapper.toUpdatePassInput(dto);
-        var updatedPassword = updatePasswordUseCase.execute(id, updatePasswordInput);
+        var updatedPassword = updatePasswordUseCase.execute(
+                id,
+                updatePasswordInput
+        );
+
         UserResponseDTO userResponseDTO = userMapper.toDto(updatedPassword);
 
         return ResponseEntity.ok(userResponseDTO);
-
     }
 }
