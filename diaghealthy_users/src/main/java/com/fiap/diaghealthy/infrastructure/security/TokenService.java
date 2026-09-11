@@ -28,12 +28,17 @@ public class TokenService {
                     .next()
                     .getAuthority();
 
-            return JWT.create()
+            var tokenBuilder = JWT.create()
                     .withIssuer("Diaghealthy")
                     .withSubject(userDetails.getUsername())
                     .withClaim("role", role)
-                    .withExpiresAt(gerarDataExpiracaoToken())
-                    .sign(algoritmo);
+                    .withExpiresAt(gerarDataExpiracaoToken());
+
+            if (userDetails instanceof CustomUserDetails customUserDetails) {
+                tokenBuilder.withClaim("id", customUserDetails.getId().toString());
+            }
+
+            return tokenBuilder.sign(algoritmo);
 
         } catch (JWTCreationException exception) {
             throw new TokenGenerationException(
