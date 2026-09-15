@@ -1,5 +1,6 @@
 package com.diaghealthy_scheduling.application.usecases;
 
+import com.diaghealthy_scheduling.application.gateways.AppointmentEventGateway;
 import com.diaghealthy_scheduling.application.gateways.UserServiceGateway;
 import com.diaghealthy_scheduling.application.inputs.AppointmentCreateInput;
 import com.diaghealthy_scheduling.domain.entities.Appointment;
@@ -9,10 +10,16 @@ public class CreateAppointmentUseCase {
 
     private final AppointmentRepository appointmentRepository;
     private final UserServiceGateway userServiceGateway;
+    private final AppointmentEventGateway appointmentEventGateway;
 
-    public CreateAppointmentUseCase(AppointmentRepository appointmentRepository, UserServiceGateway userServiceGateway) {
+    public CreateAppointmentUseCase(
+            AppointmentRepository appointmentRepository,
+            UserServiceGateway userServiceGateway,
+            AppointmentEventGateway appointmentEventGateway
+    ) {
         this.appointmentRepository = appointmentRepository;
         this.userServiceGateway = userServiceGateway;
+        this.appointmentEventGateway = appointmentEventGateway;
     }
 
     public Appointment execute(AppointmentCreateInput input) {
@@ -24,7 +31,6 @@ public class CreateAppointmentUseCase {
             userServiceGateway.findNurseById(input.nurseId());
         }
 
-
         Appointment appointment = new Appointment(
                 input.patientId(),
                 input.doctorId(),
@@ -33,6 +39,10 @@ public class CreateAppointmentUseCase {
                 input.reason()
         );
 
-        return appointmentRepository.saveAppointment(appointment);
+        Appointment savedAppointment = appointmentRepository.saveAppointment(appointment);
+
+        appointmentEventGateway.publishAppointmentCreated(savedAppointment);
+
+        return savedAppointment;
     }
 }

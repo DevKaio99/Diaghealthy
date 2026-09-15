@@ -1,0 +1,178 @@
+services:
+
+  users-app:
+    build:
+      context: ./diaghealthy_users
+      dockerfile: Dockerfile
+    container_name: diaghealthy_users-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      users-db:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://users-db:5432/${USERS_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    restart: always
+
+  users-db:
+    image: postgres:15
+    container_name: diaghealthy_users-db
+    environment:
+      POSTGRES_DB: ${USERS_DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - users_postgres_data:/var/lib/postgresql/data
+    restart: always
+
+
+
+  scheduling-app:
+    build:
+      context: ./diaghealthy_scheduling
+      dockerfile: Dockerfile
+    container_name: diaghealthy_scheduling-app
+    ports:
+      - "8081:8081"
+    depends_on:
+      scheduling-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      users-app:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://scheduling-db:5432/${SCHEDULING_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      JWT_SECRET: ${JWT_SECRET}
+
+      USER_SERVICE_URL: http://users-app:8080
+
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    restart: always
+
+  scheduling-db:
+    image: postgres:15
+    container_name: diaghealthy_scheduling-db
+    environment:
+      POSTGRES_DB: ${SCHEDULING_DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - scheduling_postgres_data:/var/lib/postgresql/data
+    restart: always
+
+
+
+  notification-app:
+    build:
+      context: ./diaghealthy_notification
+      dockerfile: Dockerfile
+    container_name: diaghealthy_notification-app
+    ports:
+      - "8082:8082"
+    depends_on:
+      notification-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/${NOTIFICATION_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      JWT_SECRET: ${JWT_SECRET}
+
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    restart: always
+
+  notification-db:
+    image: postgres:15
+    container_name: diaghealthy_notification-db
+    environment:
+      POSTGRES_DB: ${NOTIFICATION_DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - notification_postgres_data:/var/lib/postgresql/data
+    restart: always
+
+
+
+  history-app:
+    build:
+      context: ./diaghealthy_history
+      dockerfile: Dockerfile
+    container_name: diaghealthy_history-app
+    ports:
+      - "8083:8083"
+    depends_on:
+      history-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://history-db:5432/${HISTORY_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      JWT_SECRET: ${JWT_SECRET}
+
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    restart: always
+
+  history-db:
+    image: postgres:15
+    container_name: diaghealthy_history-db
+    environment:
+      POSTGRES_DB: ${HISTORY_DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - history_postgres_data:/var/lib/postgresql/data
+    restart: always
+
+
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: diaghealthy-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: always
+
+
+volumes:
+  users_postgres_data:
+  scheduling_postgres_data:
+  notification_postgres_data:
+  history_postgres_data:
+  rabbitmq_data:

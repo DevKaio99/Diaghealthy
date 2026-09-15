@@ -1,5 +1,6 @@
 package com.diaghealthy_scheduling.infrastructure.config;
 
+import com.diaghealthy_scheduling.application.gateways.AppointmentEventGateway;
 import com.diaghealthy_scheduling.application.gateways.UserServiceGateway;
 import com.diaghealthy_scheduling.application.usecases.CreateAppointmentUseCase;
 import com.diaghealthy_scheduling.application.usecases.UpdateAppointmentUseCase;
@@ -10,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class UseCaseConfig {
     @Bean
-    public CreateAppointmentUseCase createAppointmentUseCase(AppointmentRepository appointmentRepository, UserServiceGateway userServiceGateway) {
-        return new CreateAppointmentUseCase(appointmentRepository, userServiceGateway);
+    public CreateAppointmentUseCase createAppointmentUseCase(AppointmentRepository appointmentRepository, UserServiceGateway userServiceGateway, AppointmentEventGateway appointmentEventGateway) {
+        return new CreateAppointmentUseCase(appointmentRepository, userServiceGateway, appointmentEventGateway);
     }
 
     @Bean
