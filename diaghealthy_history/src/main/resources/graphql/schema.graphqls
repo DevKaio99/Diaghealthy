@@ -1,0 +1,28 @@
+type Query {
+    "Busca um registro de histórico pelo ID"
+    medicalRecord(id: ID!): MedicalRecord
+
+    "Lista os registros de histórico de um paciente, com opção de filtrar apenas as consultas futuras"
+    medicalRecordsByPatient(patientId: ID!, onlyFuture: Boolean): [MedicalRecord!]!
+}
+
+type MedicalRecord {
+    id: ID!
+    appointmentId: ID!
+    patientId: ID!
+    doctorId: ID!
+    nurseId: ID
+    scheduledAt: String!
+    status: HistoryStatus!
+    reason: String!
+    notes: String
+    createdAt: String!
+    updatedAt: String!
+}
+
+enum HistoryStatus {
+    SCHEDULED
+    CONFIRMED
+    COMPLETED
+    CANCELLED
+}
