@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -27,6 +28,21 @@ public class GlobalExceptionHandler {
 
         problem.setTitle("Recurso não encontrado");
         problem.setDetail(ex.getMessage());
+        problem.setProperty("timestamp", LocalDateTime.now());
+        problem.setProperty("path", request.getRequestURI());
+
+        return problem;
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ProblemDetail handlerAuthorizationDenied(
+            AuthorizationDeniedException ex,
+            HttpServletRequest request) {
+
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+
+        problem.setTitle("Acesso negado");
+        problem.setDetail("Você não tem permissão para acessar este recurso.");
         problem.setProperty("timestamp", LocalDateTime.now());
         problem.setProperty("path", request.getRequestURI());
 

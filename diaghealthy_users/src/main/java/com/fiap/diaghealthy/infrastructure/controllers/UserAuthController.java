@@ -4,6 +4,7 @@ import com.fiap.diaghealthy.infrastructure.dtos.users.user.UserAutenticationDTO;
 import com.fiap.diaghealthy.infrastructure.dtos.users.user.UserLoginResponseDTO;
 import com.fiap.diaghealthy.infrastructure.security.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class UserAuthController {
     }
 
     @Operation(summary = "Autenticação de Usuário", description = "Realiza a validação de usuário do banco de dados através de login (e-mail) e senha para a liberação do uso das requisições dos Controllers via Token gerado.")
+    @SecurityRequirements
     @PostMapping("/login")
     public ResponseEntity login (@RequestBody @Valid UserAutenticationDTO dto) {
 

@@ -29,7 +29,12 @@ public class UpdatePatientUseCase {
         UUID loggedUserId = currentUser.getId();
         Role loggedUserRole = currentUser.getRole();
 
-        if (!loggedUserId.equals(id) && loggedUserRole != Role.ADMIN) {
+        boolean isSelf = loggedUserId.equals(id);
+        boolean isStaff = loggedUserRole == Role.ADMIN
+                || loggedUserRole == Role.DOCTOR
+                || loggedUserRole == Role.NURSE;
+
+        if (!isSelf && !isStaff) {
             throw new UnauthorizedException("Usuário não possui permissão para alterar este usuário");
         }
 

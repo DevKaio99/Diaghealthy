@@ -1,0 +1,601 @@
+{
+  "info": {
+    "name": "Diaghealthy",
+    "description": "Collection completa dos 4 microsserviços do Diaghealthy (Tech Challenge Fase 3). Suba a stack antes com `docker compose up -d --build` na raiz do projeto. Rode as requisições na ordem das pastas (01 a 06): os logins e os cadastros salvam automaticamente tokens e IDs em variáveis de collection, usados pelas requisições seguintes. Os usuários admin@email.com / patient@email.com / doctor@email.com / nurse@email.com (senha igual ao papel, ex: admin123) já vêm de seed no diaghealthy_users.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "users_url", "value": "http://localhost:8080" },
+    { "key": "scheduling_url", "value": "http://localhost:8081" },
+    { "key": "notification_url", "value": "http://localhost:8082" },
+    { "key": "history_url", "value": "http://localhost:8083" },
+    { "key": "token", "value": "" },
+    { "key": "admin_token", "value": "" },
+    { "key": "patient_token", "value": "" },
+    { "key": "doctor_token", "value": "" },
+    { "key": "nurse_token", "value": "" },
+    { "key": "patient_id", "value": "" },
+    { "key": "doctor_id", "value": "" },
+    { "key": "nurse_id", "value": "" },
+    { "key": "appointment_id", "value": "" },
+    { "key": "notification_id", "value": "" },
+    { "key": "history_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 - Autenticação",
+      "item": [
+        {
+          "name": "Login como Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"token\", pm.response.json().token);",
+                  "pm.collectionVariables.set(\"admin_token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@email.com\",\n  \"password\": \"admin123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/auth/login",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Usuário seed criado pelo DataInitializer do diaghealthy_users."
+          }
+        },
+        {
+          "name": "Login como Médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"doctor_token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor@email.com\",\n  \"password\": \"doctor123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/auth/login",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login como Enfermeiro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"nurse_token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nurse@email.com\",\n  \"password\": \"nurse123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/auth/login",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login como Paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"patient_token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patient@email.com\",\n  \"password\": \"patient123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/auth/login",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Usuários",
+      "item": [
+        {
+          "name": "Criar Médico (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set(\"doctor_id\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dra. Ana Souza\",\n  \"email\": \"ana.souza.{{$guid}}@email.com\",\n  \"password\": \"senha123\",\n  \"crm\": \"CRM{{$timestamp}}\",\n  \"speciality\": \"Cardiologia\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/users/doctor",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "users", "doctor"]
+            },
+            "description": "Somente ADMIN pode criar médico."
+          }
+        },
+        {
+          "name": "Atualizar Médico (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dra. Ana Souza\",\n  \"email\": \"ana.souza.{{$guid}}@email.com\",\n  \"isActive\": true,\n  \"crm\": \"CRM{{$timestamp}}{{$randomInt}}\",\n  \"speciality\": \"Cardiologia Pediátrica\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/users/doctor/{{doctor_id}}",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "users", "doctor", "{{doctor_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Criar Enfermeiro (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set(\"nurse_id\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Enf. Bruno Lima\",\n  \"email\": \"bruno.lima.{{$guid}}@email.com\",\n  \"password\": \"senha123\",\n  \"coren\": \"COREN{{$timestamp}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/users/nurse",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "users", "nurse"]
+            },
+            "description": "Somente ADMIN pode criar enfermeiro."
+          }
+        },
+        {
+          "name": "Atualizar Enfermeiro (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Enf. Bruno Lima\",\n  \"email\": \"bruno.lima.{{$guid}}@email.com\",\n  \"coren\": \"COREN{{$timestamp}}{{$randomInt}}\",\n  \"isActive\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/users/nurse/{{nurse_id}}",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "users", "nurse", "{{nurse_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Criar Paciente (ADMIN/DOCTOR/NURSE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set(\"patient_id\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{nurse_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Carlos Pereira\",\n  \"email\": \"carlos.pereira.{{$guid}}@email.com\",\n  \"password\": \"senha123\",\n  \"dateOfBirth\": \"1990-05-20\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/users/patient",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "users", "patient"]
+            },
+            "description": "ADMIN, DOCTOR ou NURSE podem criar paciente."
+          }
+        },
+        {
+          "name": "Atualizar Paciente (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Carlos Pereira\",\n  \"email\": \"carlos.pereira.{{$guid}}@email.com\",\n  \"dateOfBirth\": \"1990-05-20\",\n  \"isActive\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/users/patient/{{patient_id}}",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "users", "patient", "{{patient_id}}"]
+            },
+            "description": "Apesar do endpoint aceitar ADMIN/DOCTOR/NURSE na anotação de rota, a regra de negócio do UpdatePatientUseCase só permite o próprio usuário ou ADMIN — DOCTOR/NURSE editando outra pessoa recebem 500 (bug pré-existente, reportado ao Kaio)."
+          }
+        },
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{users_url}}/api/v1/user/{{patient_id}}",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "user", "{{patient_id}}"]
+            },
+            "description": "Endpoint usado internamente pelos outros serviços (scheduling/notification/history) para validar usuários."
+          }
+        },
+        {
+          "name": "Alterar Senha do Paciente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"senha123\",\n  \"newPassword\": \"novaSenha456\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{users_url}}/api/v1/user/changepass/{{patient_id}}",
+              "host": ["{{users_url}}"],
+              "path": ["api", "v1", "user", "changepass", "{{patient_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Agendamento (scheduling)",
+      "item": [
+        {
+          "name": "Criar Agendamento (ADMIN/DOCTOR/NURSE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set(\"appointment_id\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{nurse_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"doctorId\": \"{{doctor_id}}\",\n  \"nurseId\": null,\n  \"scheduledAt\": \"2027-03-10T10:00:00\",\n  \"reason\": \"Consulta de rotina\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{scheduling_url}}/api/v1/appointments",
+              "host": ["{{scheduling_url}}"],
+              "path": ["api", "v1", "appointments"]
+            },
+            "description": "Ao criar, publica um evento no RabbitMQ (routing key appointment.created) — o Notification Service envia (simula) um lembrete e o History Service registra o atendimento automaticamente. Confira as pastas 04 e 05 depois de rodar esta requisição."
+          }
+        },
+        {
+          "name": "Editar Agendamento (ADMIN/DOCTOR/NURSE)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{nurse_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scheduledAt\": \"2027-03-12T14:30:00\",\n  \"status\": \"CONFIRMED\",\n  \"reason\": \"Consulta de rotina - reagendada\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{scheduling_url}}/api/v1/appointments/{{appointment_id}}",
+              "host": ["{{scheduling_url}}"],
+              "path": ["api", "v1", "appointments", "{{appointment_id}}"]
+            },
+            "description": "Também publica evento no RabbitMQ (routing key appointment.updated) — dispara um novo lembrete e ATUALIZA (sem duplicar) o registro de histórico do mesmo agendamento."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Notificações (notification)",
+      "item": [
+        {
+          "name": "Registrar Notificação manualmente (ADMIN/DOCTOR/NURSE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set(\"notification_id\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{doctor_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentId\": \"{{appointment_id}}\",\n  \"patientId\": \"{{patient_id}}\",\n  \"scheduledAt\": \"2027-03-10T10:00:00\",\n  \"reason\": \"Lembrete manual de teste\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{notification_url}}/api/v1/notifications",
+              "host": ["{{notification_url}}"],
+              "path": ["api", "v1", "notifications"]
+            },
+            "description": "Uso manual/teste — em produção normal, este cadastro acontece sozinho via RabbitMQ quando um agendamento é criado/editado. O campo patientEmail é opcional: se omitido, busca o e-mail no diaghealthy_users."
+          }
+        },
+        {
+          "name": "Buscar Notificação por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{notification_url}}/api/v1/notifications/{{notification_id}}",
+              "host": ["{{notification_url}}"],
+              "path": ["api", "v1", "notifications", "{{notification_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Listar Notificações do Paciente",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{notification_url}}/api/v1/notifications/patient/{{patient_id}}",
+              "host": ["{{notification_url}}"],
+              "path": ["api", "v1", "notifications", "patient", "{{patient_id}}"]
+            },
+            "description": "ADMIN/DOCTOR/NURSE veem qualquer paciente; PATIENT só vê as próprias (use {{patient_token}} para testar essa restrição)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Histórico REST (history)",
+      "item": [
+        {
+          "name": "Registrar Histórico manualmente (ADMIN/DOCTOR/NURSE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set(\"history_id\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{nurse_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentId\": \"{{appointment_id}}\",\n  \"patientId\": \"{{patient_id}}\",\n  \"doctorId\": \"{{doctor_id}}\",\n  \"nurseId\": null,\n  \"scheduledAt\": \"2027-03-10T10:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"reason\": \"Registro manual de teste\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{history_url}}/api/v1/history",
+              "host": ["{{history_url}}"],
+              "path": ["api", "v1", "history"]
+            },
+            "description": "Uso manual/teste — o registro do agendamento acima já foi criado automaticamente via RabbitMQ. Use um appointmentId diferente aqui para não fazer upsert sobre o mesmo registro."
+          }
+        },
+        {
+          "name": "Editar Histórico - notas do médico (ADMIN/DOCTOR/NURSE)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{doctor_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\",\n  \"notes\": \"Paciente sem queixas. Retorno em 6 meses.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{history_url}}/api/v1/history/{{history_id}}",
+              "host": ["{{history_url}}"],
+              "path": ["api", "v1", "history", "{{history_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Histórico por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{history_url}}/api/v1/history/{{history_id}}",
+              "host": ["{{history_url}}"],
+              "path": ["api", "v1", "history", "{{history_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Listar Histórico do Paciente (onlyFuture)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{history_url}}/api/v1/history/patient/{{patient_id}}?onlyFuture=true",
+              "host": ["{{history_url}}"],
+              "path": ["api", "v1", "history", "patient", "{{patient_id}}"],
+              "query": [{ "key": "onlyFuture", "value": "true" }]
+            },
+            "description": "onlyFuture=false (ou omitido) lista todo o histórico; true filtra só consultas futuras."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Histórico GraphQL (history)",
+      "item": [
+        {
+          "name": "Query: medicalRecordsByPatient",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query($patientId: ID!, $onlyFuture: Boolean) { medicalRecordsByPatient(patientId: $patientId, onlyFuture: $onlyFuture) { id appointmentId patientId doctorId nurseId scheduledAt status reason notes createdAt updatedAt } }\",\n  \"variables\": {\n    \"patientId\": \"{{patient_id}}\",\n    \"onlyFuture\": false\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{history_url}}/graphql",
+              "host": ["{{history_url}}"],
+              "path": ["graphql"]
+            },
+            "description": "Equivalente GraphQL do GET /api/v1/history/patient/{id}. Mesma regra de posse: PATIENT só consegue consultar o próprio patientId."
+          }
+        },
+        {
+          "name": "Query: medicalRecord (por ID)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query($id: ID!) { medicalRecord(id: $id) { id appointmentId patientId doctorId nurseId scheduledAt status reason notes createdAt updatedAt } }\",\n  \"variables\": {\n    \"id\": \"{{history_id}}\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{history_url}}/graphql",
+              "host": ["{{history_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

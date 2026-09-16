@@ -2,10 +2,14 @@ package com.fiap.diaghealthy.infrastructure.handlers;
 
 import com.fiap.diaghealthy.application.exceptions.BusinessException;
 import com.fiap.diaghealthy.application.exceptions.ResourceNotFoundException;
+import com.fiap.diaghealthy.application.exceptions.UnauthorizedException;
 import com.fiap.diaghealthy.infrastructure.security.exceptions.TokenGenerationException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,6 +20,8 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -42,6 +48,36 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
 
         problem.setTitle("Erro de regra de negócio");
+        problem.setDetail(ex.getMessage());
+        problem.setProperty("timestamp", LocalDateTime.now());
+        problem.setProperty("path", request.getRequestURI());
+
+        return problem;
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ProblemDetail handlerAuthorizationDenied(
+            AuthorizationDeniedException ex,
+            HttpServletRequest request) {
+
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+
+        problem.setTitle("Acesso negado");
+        problem.setDetail("Você não tem permissão para acessar este recurso.");
+        problem.setProperty("timestamp", LocalDateTime.now());
+        problem.setProperty("path", request.getRequestURI());
+
+        return problem;
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ProblemDetail handlerUnauthorized(
+            UnauthorizedException ex,
+            HttpServletRequest request) {
+
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+
+        problem.setTitle("Acesso negado");
         problem.setDetail(ex.getMessage());
         problem.setProperty("timestamp", LocalDateTime.now());
         problem.setProperty("path", request.getRequestURI());
@@ -76,6 +112,8 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleGenericException(
             Exception ex,
             HttpServletRequest request) {
+
+        log.error("Erro inesperado ao processar {}", request.getRequestURI(), ex);
 
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 
