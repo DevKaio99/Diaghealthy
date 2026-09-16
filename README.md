@@ -54,6 +54,35 @@ O `diaghealthy_history` expõe `POST /graphql`, com duas consultas:
 
 Interface interativa (GraphiQL) disponível em `http://localhost:8083/graphiql`, sem necessidade de autenticação para carregar a página (as consultas em si continuam exigindo o JWT).
 
+## Resiliência (Rate Limiting e Circuit Breaker)
+
+Implementado com **Resilience4j** para deixar a API mais resistente a picos de tráfego e a falhas de dependências entre serviços.
+
+### Rate Limiting (nos 4 serviços)
+
+Cada serviço limita a quantidade de requisições que aceita processar por instância, protegendo-se contra sobrecarga (excesso de requisições chegando). Configurável via `application.properties`:
+
+```properties
+rate-limiter.limit-for-period=50
+rate-limiter.limit-refresh-period-ms=1000
+rate-limiter.timeout-duration-ms=0
+```
+
+Por padrão, até 50 requisições por segundo por instância; quem exceder recebe `429 Too Many Requests`. O filtro roda antes até da validação do JWT, evitando gastar processamento com requisições que já serão descartadas.
+
+### Circuit Breaker (no `diaghealthy_scheduling`)
+
+O `scheduling` é o serviço que mais depende de outro (chama o `diaghealthy_users` de forma síncrona em toda criação/edição de agendamento, pra validar paciente, médico e enfermeiro). Um circuit breaker protege essa chamada: se o `users` começar a falhar muito, o circuito **abre** e passa a rejeitar novas tentativas imediatamente (em vez de deixar cada requisição travada esperando um timeout de conexão), voltando a permitir chamadas automaticamente depois de um tempo de espera.
+
+```properties
+circuit-breaker.failure-rate-threshold=50
+circuit-breaker.wait-duration-in-open-state-seconds=10
+circuit-breaker.sliding-window-size=10
+circuit-breaker.permitted-calls-in-half-open-state=3
+```
+
+Com esses valores: se pelo menos 50% das últimas 10 chamadas ao `users` falharem, o circuito abre por 10 segundos; depois disso, libera algumas chamadas de teste (half-open) para verificar se o `users` já voltou, antes de fechar de novo.
+
 ## Como executar
 
 Pré-requisitos: Docker e Docker Compose.
@@ -94,6 +123,7 @@ O arquivo [`Diaghealthy.postman_collection.json`](./Diaghealthy.postman_collecti
 - Spring Data JDBC
 - Spring for GraphQL
 - Spring AMQP (RabbitMQ)
+- Resilience4j (Rate Limiter + Circuit Breaker)
 - PostgreSQL
 - springdoc-openapi (Swagger)
 - Docker / Docker Compose

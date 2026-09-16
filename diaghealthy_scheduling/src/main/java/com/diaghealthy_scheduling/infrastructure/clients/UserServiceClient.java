@@ -3,6 +3,7 @@ package com.diaghealthy_scheduling.infrastructure.clients;
 import com.diaghealthy_scheduling.application.gateways.UserResponse;
 import com.diaghealthy_scheduling.application.gateways.UserServiceGateway;
 import com.diaghealthy_scheduling.domain.enuns.Role;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -12,26 +13,31 @@ import java.util.UUID;
 public class UserServiceClient implements UserServiceGateway {
 
     private final RestClient restClient;
+    private final CircuitBreaker circuitBreaker;
 
-    public UserServiceClient(RestClient restClient) {
+    public UserServiceClient(RestClient restClient, CircuitBreaker userServiceCircuitBreaker) {
         this.restClient = restClient;
+        this.circuitBreaker = userServiceCircuitBreaker;
     }
 
     @Override
     public UserResponse findUserById(UUID id) {
 
-        UserResponseDTO response = restClient
-                .get()
-                .uri("/api/v1/user/{id}", id)
-                .retrieve()
-                .body(UserResponseDTO.class);
+        return circuitBreaker.executeSupplier(() -> {
 
-        return new UserResponse(
-                response.id(),
-                response.email(),
-                response.role(),
-                response.active()
-        );
+            UserResponseDTO response = restClient
+                    .get()
+                    .uri("/api/v1/user/{id}", id)
+                    .retrieve()
+                    .body(UserResponseDTO.class);
+
+            return new UserResponse(
+                    response.id(),
+                    response.email(),
+                    response.role(),
+                    response.active()
+            );
+        });
     }
 
     @Override
