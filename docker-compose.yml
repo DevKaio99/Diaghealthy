@@ -88,12 +88,16 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_started
+      users-app:
+        condition: service_started
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/${NOTIFICATION_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
       JWT_SECRET: ${JWT_SECRET}
+
+      USER_SERVICE_URL: http://users-app:8080
 
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
@@ -128,12 +132,16 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_started
+      users-app:
+        condition: service_started
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://history-db:5432/${HISTORY_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
       JWT_SECRET: ${JWT_SECRET}
+
+      USER_SERVICE_URL: http://users-app:8080
 
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672

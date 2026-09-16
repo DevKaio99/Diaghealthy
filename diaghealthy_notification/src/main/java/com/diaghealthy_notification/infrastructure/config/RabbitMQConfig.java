@@ -19,6 +19,9 @@ public class RabbitMQConfig {
     public static final String APPOINTMENT_CREATED_ROUTING_KEY =
             "appointment.created";
 
+    public static final String APPOINTMENT_UPDATED_ROUTING_KEY =
+            "appointment.updated";
+
     @Bean
     public DirectExchange appointmentExchange() {
         return new DirectExchange(APPOINTMENT_EXCHANGE);
@@ -30,7 +33,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding notificationBinding(
+    public Binding notificationCreatedBinding(
             Queue notificationQueue,
             DirectExchange appointmentExchange
     ) {
@@ -38,5 +41,16 @@ public class RabbitMQConfig {
                 .bind(notificationQueue)
                 .to(appointmentExchange)
                 .with(APPOINTMENT_CREATED_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding notificationUpdatedBinding(
+            Queue notificationQueue,
+            DirectExchange appointmentExchange
+    ) {
+        return BindingBuilder
+                .bind(notificationQueue)
+                .to(appointmentExchange)
+                .with(APPOINTMENT_UPDATED_ROUTING_KEY);
     }
 }

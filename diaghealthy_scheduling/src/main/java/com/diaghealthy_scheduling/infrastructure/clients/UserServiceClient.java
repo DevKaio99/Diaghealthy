@@ -28,6 +28,7 @@ public class UserServiceClient implements UserServiceGateway {
 
         return new UserResponse(
                 response.id(),
+                response.email(),
                 response.role(),
                 response.active()
         );

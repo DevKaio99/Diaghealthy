@@ -3,6 +3,8 @@ package com.diaghealthy_history.infrastructure.handlers;
 import com.diaghealthy_history.application.exceptions.ResourceNotFoundException;
 import com.diaghealthy_history.application.exceptions.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ProblemDetail handlerResourceNotFound(
@@ -78,6 +82,8 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleGenericException(
             Exception ex,
             HttpServletRequest request) {
+
+        log.error("Erro inesperado ao processar {}", request.getRequestURI(), ex);
 
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 

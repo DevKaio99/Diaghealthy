@@ -64,7 +64,9 @@ public class MedicalRecordJdbc implements MedicalRecordRepository {
         String sql = """
                 UPDATE medical_records
                 SET
+                    scheduled_at = ?,
                     status = ?,
+                    reason = ?,
                     notes = ?,
                     updated_at = ?
                 WHERE id = ?
@@ -72,7 +74,9 @@ public class MedicalRecordJdbc implements MedicalRecordRepository {
 
         jdbcTemplate.update(
                 sql,
+                record.getScheduledAt(),
                 record.getStatus().name(),
+                record.getReason(),
                 record.getNotes(),
                 record.getUpdatedAt(),
                 record.getId()
@@ -105,6 +109,33 @@ public class MedicalRecordJdbc implements MedicalRecordRepository {
                 sql,
                 this::mapRow,
                 id
+        ).stream().findFirst();
+    }
+
+    @Override
+    public Optional<MedicalRecord> findRecordByAppointmentId(UUID appointmentId) {
+
+        String sql = """
+                SELECT
+                    id,
+                    appointment_id,
+                    patient_id,
+                    doctor_id,
+                    nurse_id,
+                    scheduled_at,
+                    status,
+                    reason,
+                    notes,
+                    created_at,
+                    updated_at
+                FROM medical_records
+                WHERE appointment_id = ?
+                """;
+
+        return jdbcTemplate.query(
+                sql,
+                this::mapRow,
+                appointmentId
         ).stream().findFirst();
     }
 

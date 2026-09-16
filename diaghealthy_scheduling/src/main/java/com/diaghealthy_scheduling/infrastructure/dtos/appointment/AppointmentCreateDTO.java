@@ -8,7 +8,6 @@ public record AppointmentCreateDTO(
         UUID doctorId,
         UUID nurseId,
         LocalDateTime scheduledAt,
-        String status,
         String reason
 ){
 }

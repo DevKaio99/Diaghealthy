@@ -27,6 +27,6 @@ public class HistoryRabbitConsumer {
         RegisterHistoryInput input =
                 historyMapper.toRegisterInput(dto);
 
-        registerHistoryUseCase.execute(input);
+        registerHistoryUseCase.executeFromEvent(input);
     }
 }

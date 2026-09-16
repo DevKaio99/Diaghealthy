@@ -14,7 +14,8 @@ public class NotificationMapper {
                 notificationCreateDTO.appointmentId(),
                 notificationCreateDTO.patientId(),
                 notificationCreateDTO.scheduledAt(),
-                notificationCreateDTO.reason()
+                notificationCreateDTO.reason(),
+                notificationCreateDTO.patientEmail()
         );
     }
 

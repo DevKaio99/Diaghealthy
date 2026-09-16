@@ -22,7 +22,7 @@ public class CreateNotificationUseCase {
 
     public Notification execute(NotificationCreateInput input) {
 
-        UserResponse patient = userServiceGateway.findPatientById(input.patientId());
+        String patientEmail = resolvePatientEmail(input);
 
         String message = buildMessage(input);
 
@@ -34,15 +34,26 @@ public class CreateNotificationUseCase {
 
         notification = notificationRepository.saveNotification(notification);
 
-        sendReminder(notification, patient);
+        sendReminder(notification, patientEmail);
 
         return notification;
     }
 
-    private void sendReminder(Notification notification, UserResponse patient) {
+    private String resolvePatientEmail(NotificationCreateInput input) {
+
+        if (input.patientEmail() != null && !input.patientEmail().isBlank()) {
+            return input.patientEmail();
+        }
+
+        UserResponse patient = userServiceGateway.findPatientById(input.patientId());
+
+        return patient.email();
+    }
+
+    private void sendReminder(Notification notification, String patientEmail) {
         try {
             System.out.println(
-                    "Enviando lembrete por e-mail para " + patient.email() +
+                    "Enviando lembrete por e-mail para " + patientEmail +
                             ": " + notification.getMessage()
             );
 

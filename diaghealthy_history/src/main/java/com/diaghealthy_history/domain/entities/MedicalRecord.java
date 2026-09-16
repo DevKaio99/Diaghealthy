@@ -112,6 +112,10 @@ public class MedicalRecord {
         return scheduledAt;
     }
 
+    public void setScheduledAt(LocalDateTime scheduledAt) {
+        this.scheduledAt = scheduledAt;
+    }
+
     public HistoryStatus getStatus() {
         return status;
     }
@@ -122,6 +126,10 @@ public class MedicalRecord {
 
     public String getReason() {
         return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public String getNotes() {

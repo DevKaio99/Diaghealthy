@@ -11,6 +11,7 @@ public interface MedicalRecordRepository {
     MedicalRecord saveRecord(MedicalRecord record);
     MedicalRecord updateRecord(MedicalRecord record);
     Optional<MedicalRecord> findRecordById(UUID id);
+    Optional<MedicalRecord> findRecordByAppointmentId(UUID appointmentId);
     List<MedicalRecord> findRecordsByPatientId(UUID patientId);
     List<MedicalRecord> findFutureRecordsByPatientId(UUID patientId, LocalDateTime from);
 }

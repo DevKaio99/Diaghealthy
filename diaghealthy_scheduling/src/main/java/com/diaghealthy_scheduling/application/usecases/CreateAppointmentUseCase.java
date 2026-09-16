@@ -1,6 +1,7 @@
 package com.diaghealthy_scheduling.application.usecases;
 
 import com.diaghealthy_scheduling.application.gateways.AppointmentEventGateway;
+import com.diaghealthy_scheduling.application.gateways.UserResponse;
 import com.diaghealthy_scheduling.application.gateways.UserServiceGateway;
 import com.diaghealthy_scheduling.application.inputs.AppointmentCreateInput;
 import com.diaghealthy_scheduling.domain.entities.Appointment;
@@ -24,7 +25,7 @@ public class CreateAppointmentUseCase {
 
     public Appointment execute(AppointmentCreateInput input) {
 
-        userServiceGateway.findPatientById(input.patientId());
+        UserResponse patient = userServiceGateway.findPatientById(input.patientId());
         userServiceGateway.findDoctorById(input.doctorId());
 
         if (input.nurseId() != null) {
@@ -41,7 +42,7 @@ public class CreateAppointmentUseCase {
 
         Appointment savedAppointment = appointmentRepository.saveAppointment(appointment);
 
-        appointmentEventGateway.publishAppointmentCreated(savedAppointment);
+        appointmentEventGateway.publishAppointmentCreated(savedAppointment, patient.email());
 
         return savedAppointment;
     }

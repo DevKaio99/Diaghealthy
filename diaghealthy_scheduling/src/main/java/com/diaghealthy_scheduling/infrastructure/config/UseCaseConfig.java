@@ -16,8 +16,11 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public UpdateAppointmentUseCase updateAppointmentUseCase(AppointmentRepository appointmentRepository) {
-        return new UpdateAppointmentUseCase(appointmentRepository
-        );
+    public UpdateAppointmentUseCase updateAppointmentUseCase(
+            AppointmentRepository appointmentRepository,
+            UserServiceGateway userServiceGateway,
+            AppointmentEventGateway appointmentEventGateway
+    ) {
+        return new UpdateAppointmentUseCase(appointmentRepository, userServiceGateway, appointmentEventGateway);
     }
 }

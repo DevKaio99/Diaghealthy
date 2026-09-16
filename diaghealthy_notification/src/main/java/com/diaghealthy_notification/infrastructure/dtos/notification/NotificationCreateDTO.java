@@ -7,6 +7,7 @@ public record NotificationCreateDTO(
         UUID appointmentId,
         UUID patientId,
         LocalDateTime scheduledAt,
-        String reason
+        String reason,
+        String patientEmail
 ) {
 }
